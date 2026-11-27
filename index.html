@@ -10,20 +10,98 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Personal Finance">
+  <meta name="apple-mobile-web-app-title" content="APP NOTA">
+
+  <!-- Ikon Tab Browser (Favicon) menggunakan Kode SVG Logo Anda -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 44 C18 22, 34 12, 46 14 C52 15, 56 22, 60 28 C51 34, 45 45, 42 56 C32 48, 22 45, 12 44 Z' fill='%23FFF000'/%3E%3Cpath d='M52 4 C74 2, 92 14, 92 34 C92 52, 74 62, 72 82 C60 82, 49 78, 49 62 C49 44, 72 34, 72 18 C72 10, 62 6, 52 4 Z' fill='%23D80B78'/%3E%3Cpath d='M10 52 C28 56, 38 68, 46 80 C56 94, 78 96, 94 82 C104 73, 110 60, 112 44 C115 76, 94 114, 58 114 C24 114, 6 84, 10 52 Z' fill='%23009EE3'/%3E%3C/svg%3E" />
+
+  <!-- Catatan: iOS Safari tetap membutuhkan file PNG untuk Home Screen -->
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ramma32fajr/finance/refs/heads/main/favico.png">
 
-  <link rel="icon" href="https://raw.githubusercontent.com/ramma32fajr/finance/refs/heads/main/wallet.png" />
   <style>
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      background-color: #eee;
+      background-color: #ffffff;
       overflow: hidden; /* Mencegah scroll ganda */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
+    /* Styling Splash Screen / Loading */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    #splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .logo-wrapper {
+      width: 96px;
+      height: 96px;
+      animation: pulse-logo 1.6s infinite ease-in-out;
+    }
+
+    .loading-text {
+      margin-top: 18px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: #64748b;
+    }
+
+    /* Progress bar tipis di bawah teks */
+    .loading-bar {
+      margin-top: 10px;
+      width: 110px;
+      height: 3px;
+      background-color: #e2e8f0;
+      border-radius: 99px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-bar::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -40%;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, #FFF000, #D80B78, #009EE3);
+      border-radius: 99px;
+      animation: slide-bar 1.2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-logo {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.07);
+        opacity: 0.85;
+      }
+    }
+
+    @keyframes slide-bar {
+      0% { left: -40%; }
+      100% { left: 100%; }
+    }
+
+    /* Container Iframe */
     .iframe-container {
       width: 100%;
       height: 100dvh; /* Menggunakan dvh agar pas di mobile browser */
@@ -39,6 +117,21 @@
   </style>
 </head>
 <body>
+
+  <!-- Layar Loading (Splash Screen) -->
+  <div id="splash-screen">
+    <div class="logo-wrapper">
+      <svg id="defaultLogoSvg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 44 C18 22, 34 12, 46 14 C52 15, 56 22, 60 28 C51 34, 45 45, 42 56 C32 48, 22 45, 12 44 Z" fill="#FFF000"/>
+        <path d="M52 4 C74 2, 92 14, 92 34 C92 52, 74 62, 72 82 C60 82, 49 78, 49 62 C49 44, 72 34, 72 18 C72 10, 62 6, 52 4 Z" fill="#D80B78"/>
+        <path d="M10 52 C28 56, 38 68, 46 80 C56 94, 78 96, 94 82 C104 73, 110 60, 112 44 C115 76, 94 114, 58 114 C24 114, 6 84, 10 52 Z" fill="#009EE3"/>
+      </svg>
+    </div>
+    <div class="loading-text">Memuat APP NOTA...</div>
+    <div class="loading-bar"></div>
+  </div>
+
+  <!-- Aplikasi Utama -->
   <div class="iframe-container">
     <iframe
       id="app"
@@ -50,5 +143,29 @@
       allow="fullscreen; camera; microphone; display-capture; geolocation;">
     </iframe>
   </div>
+
+  <script>
+    const iframe = document.getElementById('app');
+    const splash = document.getElementById('splash-screen');
+
+    function hideSplash() {
+      if (!splash.classList.contains('hidden')) {
+        splash.classList.add('hidden');
+        // Hapus elemen dari DOM setelah transisi selesai agar ringan
+        setTimeout(() => {
+          splash.remove();
+        }, 500);
+      }
+    }
+
+    // Hilangkan splash screen saat iframe selesai dimuat
+    iframe.addEventListener('load', () => {
+      // Jeda singkat 250ms agar rendering awal GAS benar-benar siap
+      setTimeout(hideSplash, 250);
+    });
+
+    // Pengaman (fallback): tetap buka layar setelah 8 detik jika koneksi lambat
+    setTimeout(hideSplash, 8000);
+  </script>
 </body>
 </html>
